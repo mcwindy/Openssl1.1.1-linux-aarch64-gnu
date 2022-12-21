@@ -30,7 +30,7 @@ jobs:
           git clone -b OpenSSL_1_1_1-stable --single-branch --depth=1 --recurse-submodules -j4 https://github.com/openssl/openssl.git
           cd openssl
           ./Configure linux-aarch64 --openssldir=/usr/local/ssl/linux-aarch64/
-          make -j(nproc)
+          make -j$(nproc)
           ls /usr/local/ssl/linux-aarch64/
           pwd
           tar -czvf OpenSSL1.1.1_release_linux_aarch64.tar.gz /usr/local/ssl/linux-aarch64/
@@ -39,5 +39,5 @@ jobs:
             -H "Authorization: Bearer ${{ github.token }}"\
             -H "X-GitHub-Api-Version: 2022-11-28" \
             https://api.github.com/repos/mcwindy/Openssl1.1.1-linux-aarch64-gnu/releases \
-            -d '{"tag_name":"v1.1.1s","target_commitish":"OpenSSL_1_1_1-stable","draft":true,"prerelease":false}'
+            -d '{"tag_name":"v1.1.1s","target_commitish":"main","draft":true,"prerelease":false}'
         
