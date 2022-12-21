@@ -1,0 +1,34 @@
+name: Build Openssl
+on:
+  push
+jobs:
+  aarch64_build_job:
+    runs-on: ubuntu-22.04
+    name: Build Openssl on ubuntu-22.04 aarch64
+    steps:          
+    - name: Run commands on aarch64
+      uses: uraimo/run-on-arch-action@v2
+      id: runcmd
+      with:
+        arch: aarch64
+        distro: ubuntu22.04
+        cache: true
+        
+        # Not required, but speeds up builds by storing container images in
+        # a GitHub package registry.
+        githubToken: ${{ github.token }}
+        
+        install: |
+          apt update -q -y
+          apt install -q -y g++ cmake ninja-build git perl
+        run: |
+          uname -a
+          arch
+          pwd
+          git clone -b OpenSSL_1_1_1-stable --single-branch --depth=1 --recurse-submodules -j4 https://github.com/openssl/openssl.git
+          cd openssl
+          ./Configure LIST | grep 64
+          ./Configure linux-aarch64 --openssldir=/usr/local/ssl/linux-aarch64/
+          make
+          ls /usr/local/ssl/linux-aarch64/
+        
