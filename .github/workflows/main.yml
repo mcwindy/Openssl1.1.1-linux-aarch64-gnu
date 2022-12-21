@@ -20,7 +20,7 @@ jobs:
         
         install: |
           apt update -q -y
-          apt install -q -y g++ cmake ninja-build git perl
+          apt install -q -y g++ cmake ninja-build git perl curl
         run: |
           uname -a
           arch
