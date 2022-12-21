@@ -25,11 +25,12 @@ jobs:
           uname -a
           arch
           pwd
+          nproc
           mkdir -p /usr/local/ssl/linux-aarch64/
           git clone -b OpenSSL_1_1_1-stable --single-branch --depth=1 --recurse-submodules -j4 https://github.com/openssl/openssl.git
           cd openssl
           ./Configure linux-aarch64 --openssldir=/usr/local/ssl/linux-aarch64/
-          make
+          make -j(nproc)
           ls /usr/local/ssl/linux-aarch64/
           pwd
           tar -czvf OpenSSL1.1.1_release_linux_aarch64.tar.gz /usr/local/ssl/linux-aarch64/
