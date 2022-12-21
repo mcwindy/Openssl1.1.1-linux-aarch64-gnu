@@ -18,9 +18,18 @@ jobs:
         # a GitHub package registry.
         githubToken: ${{ github.token }}
         
+        # Create an artifacts directory
+        setup: |
+          mkdir -p "${PWD}/artifacts"
+
+        # Mount the artifacts directory as /artifacts in the container
+        dockerRunArgs: |
+          --volume "${PWD}/artifacts:/artifacts"
+        
         install: |
           apt update -q -y
           apt install -q -y g++ cmake ninja-build git perl curl
+        
         run: |
           uname -a
           arch
@@ -33,11 +42,38 @@ jobs:
           make -j$(nproc)
           ls /usr/local/ssl/linux-aarch64/
           pwd
-          tar -czvf OpenSSL1.1.1_release_linux_aarch64.tar.gz /usr/local/ssl/linux-aarch64/
-          curl -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ github.token }}"\
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/mcwindy/Openssl1.1.1-linux-aarch64-gnu/releases \
-            -d '{"tag_name":"v1.1.1s","target_commitish":"main","draft":true,"prerelease":false}'
+          ls /artifacts/
+          tar -czvf /artifacts/OpenSSL1.1.1_release_linux_aarch64.tar.gz /usr/local/ssl/linux-aarch64/
+          ls /artifacts/
+          
+#     - name: Create release
+#         run: |
+#           curl -X POST \
+#             -H "Accept: application/vnd.github+json" \
+#             -H "Authorization: Bearer ${{ github.token }}"\
+#             -H "X-GitHub-Api-Version: 2022-11-28" \
+#             https://api.github.com/repos/mcwindy/Openssl1.1.1-linux-aarch64-gnu/releases \
+#             -d '{"tag_name":"v1.1.1s","target_commitish":"main","draft":true,"prerelease":false}'
+#           ls
+          
         
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: /artifacts/OpenSSL1.1.1_release_linux_aarch64.tar.gz
+        asset_name: OpenSSL1.1.1_release_linux_aarch64.tar.gz
+        asset_content_type: application/tar+gzip
