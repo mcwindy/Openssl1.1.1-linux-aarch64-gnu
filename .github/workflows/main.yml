@@ -45,16 +45,16 @@ jobs:
           tar -czvf /artifacts/OpenSSL1.1.1_release_linux_aarch64.tar.gz /usr/local/ssl/linux-aarch64/
           ls /artifacts/
         
-#     - name: Create Release
-#       id: create_release
-#       uses: actions/create-release@v1
-#       env:
-#         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#       with:
-#         tag_name: ${{ github.ref }}
-#         release_name: Release ${{ github.ref }}
-#         draft: false
-#         prerelease: false
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}_
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
     - name: list file
       run: |
         ls ${PWD}/artifacts/
